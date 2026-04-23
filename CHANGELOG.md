@@ -4,6 +4,35 @@ Note: Only use **NEW:** for entirely new prompt files, NOT for new additions/sec
 
 ### Claude Code System Prompts Changelog
 
+# [2.1.118](https://github.com/Piebald-AI/claude-code-system-prompts/commit/f5e8b4a)
+
+_+4,712 tokens_
+
+- **NEW:** Data: Anthropic CLI — Reference documentation for the `ant` CLI covering installation, authentication, command structure, input/output shaping, managed agents workflows, and scripting patterns.
+- **NEW:** System Prompt: Proactive schedule offer after follow-up work — Instructs the agent to offer a one-line `/schedule` follow-up only when completed work has a strong natural future action and the user is likely to want it.
+- **NEW:** System Prompt: WSL managed settings double opt-in — Explains that WSL can read the Windows managed settings policy chain only when the admin-enabled flag is set, with HKCU requiring an additional user opt-in.
+- **NEW:** System Reminder: Plan mode approval tool enforcement — Requires plan mode turns to end with either AskUserQuestion (for clarification) or ExitPlanMode (for plan approval), and forbids asking for approval any other way.
+- **NEW:** Tool Description: Schedule proactive offer guidance — Explains when to use the scheduling tool for recurring or one-time remote agents and when to proactively offer scheduling after successful work.
+- **REMOVED:** Agent Prompt: Agent Hook — Stop-condition verifier prompt removed.
+- **REMOVED:** System Prompt: Teammate Communication — Swarm-mode teammate communication prompt removed; the broadcast (`to: "*"`) option also dropped from the agent-teams SendMessageTool description.
+- **REMOVED:** System Reminder: Post-turn session summary — The structured-JSON inbox-triage summary reminder added in 2.1.116 has been removed.
+- **REMOVED:** Tool Description: Config — The Config tool for getting/setting Claude Code settings has been removed; the Update Claude Code Config skill now suggests the `/config` slash command instead of "the Config tool" for simple settings.
+- Agent Prompt: Explore, Plan mode (enhanced), Quick git commit, Quick PR creation, REPL tool usage, Tool Description: REPL, Tool Description: ReadFile — Generalized shell guidance to support both Bash and PowerShell environments: read-only command examples and forbidden-command lists are now branched (e.g., `Get-ChildItem`/`Get-Content` vs `ls`/`cat`; `New-Item`/`Remove-Item` vs `mkdir`/`rm`), and commit/PR templates emit PowerShell here-strings (`@'...'@` at column 0) instead of bash heredocs when running under PowerShell. REPL tips note that `shQuote` is POSIX-only and show the PowerShell single-quote-doubling alternative. ReadFile no longer hardcodes "Bash tool" for directory listing, referring instead to "the registered shell tool."
+- Agent Prompt: /schedule slash command — One-time-run support (`run_once_at`) is now gated behind a feature flag: when disabled, all references to one-off scheduling, `run_once_fired`, and the current-time anchor are suppressed. When enabled, added a "Current Time" section providing the local and UTC time at invocation and **requiring** the agent to re-check `date -u` via Bash before computing any `run_once_at` (rather than guessing from conversation context), then echo back both local and UTC for confirmation; if the resolved time is in the past, ask for clarification rather than rolling forward. Also removed the hardcoded opening AskUserQuestion prompt (skipped when the user request is already known).
+- Agent Prompt: Managed Agents onboarding flow — Setup block now defaults to emitting **YAML files + `ant` CLI commands** (`<name>.agent.yaml`, `<name>.environment.yaml`, `ant beta:agents create`/`update --version N`) so agents and environments can be checked into the repo and applied from CI; SDK setup code is now a fallback. Runtime block remains SDK code in the detected language because it must react programmatically to events.
+- Agent Prompt: Status line setup — Documented two additional vim modes (`VISUAL`, `VISUAL LINE`) for the `vim.mode` status field.
+- Agent Prompt: Verification specialist — Replaced inline temp-script guidance with a templated block (so Bash vs PowerShell guidance can be substituted).
+- Data: Claude API reference — Python — Added "Client Configuration" section covering `with_options()` per-request overrides, request timeouts (`httpx.Timeout`, `APITimeoutError`), retry behavior (auto-retries on 408/409/429/≥500 with `max_retries`), the `aiohttp` async backend (`DefaultAioHttpClient`), custom HTTP clients via `DefaultHttpxClient`/`DefaultAsyncHttpxClient` for proxies and base URLs, and `ANTHROPIC_LOG` debug logging. Added "Response Helpers" section covering `_request_id`, `to_json()`/`to_dict()`, and `.with_raw_response` for accessing raw headers.
+- Data: Files API reference — Python — Documented additional `file=` argument forms (`pathlib.Path`/`PathLike`, open binary file object) and that iterating `client.beta.files.list()` directly auto-paginates across all pages.
+- Data: Managed Agents core concepts — Added `ant` CLI examples for session ops (list/retrieve/stream events/archive/delete) and a recommendation to define agents and environments as version-controlled YAML applied via the CLI ("CLI for the control plane, SDK for the data plane"), with `agents.create()` reframed as the in-code equivalent for programmatic provisioning.
+- Data: Managed Agents overview — Added documentation routing entry pointing users wanting version-controlled YAML definitions and shell-driven API calls to `shared/anthropic-cli.md`.
+- Data: Message Batches API reference — Python — Added "List Batches (auto-pagination)" section explaining that iterating `client.messages.batches.list()` auto-paginates and documenting manual cursor controls (`has_next_page()`, `get_next_page()`, `next_page_info()`, `last_id`).
+- Data: Streaming reference — Python — Added "Low-level: `stream=True`" section showing how to pass `stream=True` to `messages.create()` for the raw event iterator (with no auto-accumulation), and added a best-practice note that large `max_tokens` without streaming raises `ValueError` because the SDK refuses non-streaming requests estimated to exceed ~10 minutes.
+- Skill: Build with Claude API (reference guide) — Added explicit routing entry pointing users to `shared/anthropic-cli.md` for terminal access, version-controlled YAML, and scripting.
+- Skill: Building LLM-powered applications with Claude — Updated Managed Agents callouts in three places to refer to the Anthropic CLI by its binary name (`ant`) and point at the dedicated `shared/anthropic-cli.md` reference instead of `shared/live-sources.md`.
+- System Reminder: Plan mode is active (5-phase) — Restructured to use templated workflow-instructions and phase-five blocks (the user-visible "must use ExitPlanMode for plan approval" enforcement now lives in the new Plan mode approval tool enforcement reminder).
+
+
 # [2.1.117](https://github.com/Piebald-AI/claude-code-system-prompts/commit/5b2d3b8)
 
 _-2,003 tokens_
